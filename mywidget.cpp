@@ -65,22 +65,16 @@ myWidget::myWidget(QWidget *parent) :
     curve3->setCurveAttribute(QwtPlotCurve::Fitted, true);
     curve3->attach(ui->qwtPlot);
 
-//配置文本框
+// //配置文本框
 //    QByteArray temp = {val0[0],val1[0],val2[0],val3[0]};
 //    ui->TextLabel->setText(temp);
 
-//pushButton设置
-    ui->pushButton->setText("启动设备");
-    connect(ui->pushButton,QPushButton::clicked,this,myWidget::getADCStart);
-    ui->pushButton_2->setText("关闭设备");
-    connect(ui->pushButton_2,QPushButton::clicked,this,myWidget::closeADC);
+// //pushButton设置
+//     ui->pushButton->setText("启动设备");
+//     connect(ui->pushButton,QPushButton::clicked,this,myWidget::getADCStart);
+//     ui->pushButton_2->setText("关闭设备");
+//     connect(ui->pushButton_2,QPushButton::clicked,this,myWidget::closeADC);
     Index = M3F20xm_OpenDevice();
-}
-
-// 开启adc
-void myWidget::getADCStart()
-{
-
     M3F20xm_Verify(Index,&Result);
     M3F20xm_InitFIFO(Index);//初始化储存器
     M3F20xm_ADCStart(Index);//开始采样
@@ -89,15 +83,28 @@ void myWidget::getADCStart()
     timer->start(10); // 10ms触发一次
 }
 
-void myWidget::closeADC()
-{
-    M3F20xm_ADCStop(Index);
+// // 开启adc
+// void myWidget::getADCStart()
+// {
 
-}
+//     M3F20xm_Verify(Index,&Result);
+//     M3F20xm_InitFIFO(Index);//初始化储存器
+//     M3F20xm_ADCStart(Index);//开始采样
+//     QTimer *timer = new QTimer(this);
+//     connect(timer,&QTimer::timeout, this, &myWidget::timerUpdate);
+//     timer->start(10); // 10ms触发一次
+// }
+
+// void myWidget::closeADC()
+// {
+//     M3F20xm_ADCStop(Index);
+
+// }
 
 //析构函数
 myWidget::~myWidget()
 {
+    M3F20xm_ADCStop(Index);
     M3F20xm_CloseDevice(Index);
     delete ui;
 
@@ -122,8 +129,8 @@ void myWidget::timerUpdate()
     curve3->setSamples(time,val3);
     ui->qwtPlot->replot();
 
-    pointX.replace(0,val0[0]/val2[0]);//点赋值
-    pointY.replace(0,val1[0]/val3[0]);
+    pointX.replace(0,val0[0]/val2[0]*10);//点赋值
+    pointY.replace(0,val1[0]/val3[0]*10);
     point0->setSamples(pointX,pointY);
     ui->qwtPlot0->replot();
 }
